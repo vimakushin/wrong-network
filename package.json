@@ -1,0 +1,14 @@
+{
+  "name": "wrong-network",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@noble/hashes": "^2.4.0",
+    "@scure/base": "^2.4.0"
+  },
+  "type": "module",
+  "private": true
+}
