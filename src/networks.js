@@ -1,0 +1,39 @@
+// Реестр сетей, которые можно выбрать как «сеть отправки» (TZ.md, раздел 3
+// и раздел 5). Только данные для сопоставления с семейством адреса — никакого
+// текста для пользователя здесь нет и не должно быть.
+//
+// `family` — семейство из src/address.js, которому принадлежит сеть.
+// `family: null` — формат этой сети не реализован в src/address.js, поэтому
+// определить пригодность адреса нельзя (Avalanche X-Chain, TZ.md раздел 5:
+// «X-Chain — свой формат с префиксом»). Отсутствие поддержки — не повод
+// угадывать: дерево исходов честно отвечает «не знаем».
+// `prefix` — только у сетей семейства cosmos, сверяется с полем `prefix`,
+// которое возвращает detectFamily для этого семейства.
+//
+// Bitcoin Cash сюда включён только из-за устаревшего формата адреса,
+// совпадающего с Bitcoin (TZ.md, раздел 5). Ограничение «только устаревший
+// формат» — в src/outcome.js, рядом с остальной логикой особых случаев,
+// а не здесь: реестр — просто список, а не место для условий.
+
+export const NETWORKS = {
+  ethereum: { family: 'evm' },
+  'bnb-smart-chain': { family: 'evm' },
+  polygon: { family: 'evm' },
+  arbitrum: { family: 'evm' },
+  optimism: { family: 'evm' },
+  base: { family: 'evm' },
+  'avalanche-c-chain': { family: 'evm' },
+
+  tron: { family: 'tron' },
+  solana: { family: 'solana' },
+  ton: { family: 'ton' },
+
+  bitcoin: { family: 'bitcoin' },
+  'bitcoin-cash': { family: 'bitcoin' },
+
+  'cosmos-hub': { family: 'cosmos', prefix: 'cosmos' },
+  osmosis: { family: 'cosmos', prefix: 'osmo' },
+  'bnb-beacon-chain': { family: 'cosmos', prefix: 'bnb' },
+
+  'avalanche-x-chain': { family: null },
+};

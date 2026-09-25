@@ -90,7 +90,11 @@ function detectBech32(s) {
     // Cosmos использует только bech32; 20 байт — обычный счёт, 32 — контракт.
     const len = plain && bech32.fromWordsUnsafe(plain.words)?.length;
     if (len !== 20 && len !== 32) return bad;
-    return { family, status: 'valid', networks: [COSMOS_PREFIXES[prefix]] };
+    // `prefix` — машиночитаемый ключ для дерева исходов (src/outcome.js),
+    // отдельно от `networks`: тот несёт название для человека и может
+    // измениться от правки редактора, а логика должна опираться на что-то
+    // устойчивое.
+    return { family, status: 'valid', networks: [COSMOS_PREFIXES[prefix]], prefix };
   }
 
   // Сегвит: первое слово — версия. Версия 0 кодируется bech32 и несёт
@@ -101,7 +105,10 @@ function detectBech32(s) {
   const ok = version === 0
     ? plain && (program.length === 20 || program.length === 32)
     : m && program.length >= 2 && program.length <= 40;
-  return ok ? { family, status: 'valid', networks: BITCOIN_SEGWIT_NETWORKS } : bad;
+  // `variant` — тем же способом и по той же причине, что `prefix` у Cosmos
+  // выше: опасный случай Bitcoin/Bitcoin Cash в src/outcome.js различает
+  // устаревший формат и сегвит, а не текст названия сети.
+  return ok ? { family, status: 'valid', networks: BITCOIN_SEGWIT_NETWORKS, variant: 'segwit' } : bad;
 }
 
 // TON: 48 знаков base64 или base64url, внутри 36 байт — флаги, номер
@@ -141,7 +148,10 @@ function detectBase58(s) {
       return payload ? { family: 'tron', status: 'valid', networks: ['Tron'] } : { family: 'tron', status: 'bad-checksum' };
     }
     if (version === 0x00 || version === 0x05) {
-      return payload ? { family: 'bitcoin', status: 'valid', networks: BITCOIN_LEGACY_NETWORKS } : { family: 'bitcoin', status: 'bad-checksum' };
+      // `variant: 'legacy'` — см. комментарий у 'segwit' выше, тот же смысл.
+      return payload
+        ? { family: 'bitcoin', status: 'valid', networks: BITCOIN_LEGACY_NETWORKS, variant: 'legacy' }
+        : { family: 'bitcoin', status: 'bad-checksum' };
     }
     return null;
   }
