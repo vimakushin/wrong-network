@@ -21,9 +21,12 @@
 //                      не сошлась: скорее всего, опечатка.
 //   Для 'bad-checksum' сетей не указываем: адреса как такового нет.
 
-import { keccak_256 } from '@noble/hashes/sha3.js';
-import { sha256 } from '@noble/hashes/sha2.js';
-import { base58, createBase58check, bech32, bech32m } from '@scure/base';
+// Библиотеки — копиями из vendor/, а не из node_modules: так их код лежит
+// в репозитории открыто и его можно прочитать. Откуда и каких версий —
+// vendor/README.md.
+import { keccak_256 } from '../vendor/noble-hashes/sha3.js';
+import { sha256 } from '../vendor/noble-hashes/sha2.js';
+import { base58, createBase58check, bech32, bech32m } from '../vendor/scure-base/index.js';
 
 const base58check = createBase58check(sha256);
 
@@ -98,9 +101,12 @@ function detectBech32(s) {
   }
 
   // Сегвит: первое слово — версия. Версия 0 кодируется bech32 и несёт
-  // 20 или 32 байта, версии 1–16 — bech32m и от 2 до 40 байт (BIP-141, BIP-350).
-  // Правила сверены по официальной документации, 28 сентября 2026 (владелец
-  // проекта, интернета у модели нет).
+  // 20 или 32 байта (BIP-173, адреса bc1q…), версии 1–16 — bech32m и от 2
+  // до 40 байт (BIP-350, адреса bc1p…). Формат адреса задают именно эти два
+  // стандарта; BIP-141 описывает сегвит как механику, а не формат адреса.
+  // Сверено владельцем проекта 28 сентября 2026:
+  // github.com/bitcoin/bips/blob/master/bip-0173.mediawiki
+  // bips.dev/350/
   const [version, ...rest] = (plain || m).words;
   const program = bech32.fromWordsUnsafe(rest);
   if (version > 16 || !program) return bad;
