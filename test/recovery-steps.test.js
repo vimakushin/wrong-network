@@ -47,7 +47,9 @@ test('исход B, Bitcoin с пометкой btc-bch-legacy: шаги про 
     specialCases: ['btc-bch-legacy'],
     facts: { networkId: 'bitcoin-cash', recipientType: 'own-wallet', addressFamily: 'bitcoin', addressStatus: 'valid', addressVariant: 'legacy' },
   }));
-  assert.ok(r.steps.some((s) => s.includes('Bitcoin Cash')));
+  assert.equal(r.steps.length, 2);
+  assert.ok(r.steps[0].includes('вторую сеть'));
+  assert.ok(r.steps[1].includes('в обеих сетях'));
   assert.ok(!r.steps.some((s) => s.includes('Добавьте в свой кошелёк сеть')));
 });
 
