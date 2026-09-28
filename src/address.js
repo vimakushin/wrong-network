@@ -118,8 +118,9 @@ function detectBech32(s) {
 // Флаги 0x11 (EQ…, bounceable) и 0x51 (UQ…, non-bounceable) — основная сеть;
 // бит +0x80 в флаге — признак тестовой сети (тогда первые буквы получаются
 // не EQ/UQ, а другие — regex ниже их и так не пропускает, тестовую сеть
-// не опознаём). Сверено по официальной документации TON, 28 сентября 2026
-// (владелец проекта, интернета у модели нет).
+// не опознаём). Сверено владельцем проекта по официальной документации
+// TON, 28 сентября 2026:
+// docs.ton.org/v3/documentation/smart-contracts/addresses/address-formats
 function detectTon(s) {
   if (!/^[EU]Q[A-Za-z0-9+/_-]{46}$/.test(s)) return null;
   const bytes = Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
@@ -140,8 +141,8 @@ function crc16xmodem(bytes) {
 // Base58: Tron, Bitcoin 1…/3… и Solana.
 // Tron и Bitcoin — Base58Check: версия + 20 байт + 4 байта двойного SHA-256,
 // всего 25 байт. Версия 0x41 — Tron (отсюда буква T), 0x00 и 0x05 — Bitcoin.
-// Байт версии для Tron сверен по официальной документации TRON, 28 сентября
-// 2026 (владелец проекта, интернета у модели нет).
+// Байт версии для Tron сверен владельцем проекта по официальной
+// документации TRON, 28 сентября 2026: developers.tron.network/docs/account
 // Solana — просто 32 байта открытого ключа, контрольной суммы в формате нет.
 function detectBase58(s) {
   let raw;

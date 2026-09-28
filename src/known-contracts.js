@@ -17,13 +17,13 @@
 // развёртыванию в конкретной сети.
 //
 // Все три адреса проверены владельцем 28 сентября 2026 по обозревателям
-// блокчейнов — Etherscan, BscScan, Tronscan соответственно.
+// блокчейнов — etherscan.io, bscscan.com, tronscan.org соответственно.
 
 export const KNOWN_CONTRACTS = [
   {
     address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     network: 'ethereum',
-    source: 'Etherscan, сверено 28 сентября 2026: контракт токена USDT в Ethereum',
+    source: 'etherscan.io, сверено 28 сентября 2026: контракт токена USDT в Ethereum',
   },
   {
     address: '0x55d398326f99059fF775485246999027B3197955',
@@ -32,12 +32,12 @@ export const KNOWN_CONTRACTS = [
     // Binance, а не Tether. По назначению для пользователя разница не важна
     // (оба доллар-обёртки, потерянные деньги — потеряны одинаково), но
     // называть его в текстах и коде «токеном Tether» неверно по факту.
-    source: 'BscScan, сверено 28 сентября 2026: контракт токена Binance-Peg BSC-USD (BEP-20) в BNB Smart Chain, выпущен Binance',
+    source: 'bscscan.com, сверено 28 сентября 2026: контракт токена Binance-Peg BSC-USD (BEP-20) в BNB Smart Chain, выпущен Binance',
   },
   {
     address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
     network: 'tron',
-    source: 'Tronscan, сверено 28 сентября 2026: контракт токена USDT в Tron',
+    source: 'tronscan.org, сверено 28 сентября 2026: контракт токена USDT в Tron',
   },
 ];
 

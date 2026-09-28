@@ -94,10 +94,35 @@ test('исход F: своя роль в тексте зависит от тип
   assert.ok(own.steps.at(-1).includes('можете провести сами'));
   assert.ok(other.steps.at(-1).includes('связаться с ним'));
   assert.ok(exchange.steps.at(-1).includes('поддержку'));
+  // Не просто «объясните ситуацию» — конкретно, что указать и приложить
+  // (нашёл editor: без этого шаг для биржи выпадал из общей планки
+  // «действие, а не отсылка к поддержке»).
+  assert.ok(exchange.steps.at(-1).includes('docs.bnbchain.org'));
 
   // Первые (общие, не зависящие от роли) шаги одинаковы для всех троих.
   assert.deepEqual(own.steps.slice(0, -1), other.steps.slice(0, -1));
   assert.deepEqual(own.steps.slice(0, -1), exchange.steps.slice(0, -1));
+});
+
+test('исход B и C: сид-фраза названа без числа слов — бывает и двенадцать, и двадцать четыре', () => {
+  const evm = getSteps(result('B'));
+  assert.ok(!evm.steps.join(' ').includes('двенадцать слов'));
+  assert.ok(evm.steps.join(' ').includes('сид-фраз'));
+
+  const btcBch = getSteps(result('B', {
+    specialCases: ['btc-bch-legacy'],
+    facts: { networkId: 'bitcoin-cash', recipientType: 'own-wallet', addressFamily: 'bitcoin', addressStatus: 'valid', addressVariant: 'legacy' },
+  }));
+  assert.ok(!btcBch.steps.join(' ').includes('двенадцать слов'));
+});
+
+test('исход F: инструмент восстановления назван по имени и со ссылкой, а не расплывчато', () => {
+  const r = getSteps(result('F', { facts: { networkId: 'bnb-beacon-chain', recipientType: 'own-wallet', addressFamily: 'cosmos', addressStatus: 'valid', addressPrefix: 'bnb' } }));
+  const all = r.steps.join(' ');
+  assert.ok(all.includes('github.com/bnb-chain/token-recover-self-service-tools'));
+  // Старая версия-сайт отключена, но не должна читаться как «всё пропало».
+  assert.ok(all.includes('1 июля 2026'));
+  assert.ok(all.includes('не значит, что всё пропало'));
 });
 
 test('исход F: конкретных адресов контрактов, версий Node.js и параметров газа в тексте нет', () => {
