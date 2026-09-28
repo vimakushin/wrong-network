@@ -82,6 +82,17 @@ test('признак «нет контрольной суммы» доходит
   assert.ok(parts.some((p) => p.key === 'NO_CHECKSUM_NOTE'));
 });
 
+test('в src/texts.js не осталось ни одного пустого текста — страницу с заглушкой не опубликовать', () => {
+  const empty = [];
+  for (const [name, value] of Object.entries(T)) {
+    if (value === null) empty.push(name);
+    else if (typeof value === 'object') {
+      for (const [key, text] of Object.entries(value)) if (text === null) empty.push(`${name}.${key}`);
+    }
+  }
+  assert.deepEqual(empty, []);
+});
+
 test('названия есть у каждой сети из src/networks.js и у каждого типа получателя — и ни одного лишнего', () => {
   assert.deepEqual(Object.keys(T.NETWORK_NAMES).sort(), Object.keys(NETWORKS).sort());
   assert.deepEqual(Object.keys(T.RECIPIENT_OPTIONS).sort(), [...RECIPIENT_TYPES].sort());
