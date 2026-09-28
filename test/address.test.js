@@ -12,7 +12,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { detectFamily } from '../src/address.js';
+import { detectFamily, looksLikeSeedPhrase } from '../src/address.js';
 
 const REAL = {
   evm: [
@@ -142,4 +142,30 @@ test('неопознанное — не угадываем', () => {
 
 test('пробелы и перевод строки по краям не мешают', () => {
   assert.equal(detectFamily('  ' + REAL.tron[0] + '\n').status, 'valid');
+});
+
+// Фраза ниже — общеизвестный тестовый пример из стандарта сид-фраз,
+// специально для тестов; реальных денег за ней нет.
+const TEST_PHRASE = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+
+test('сид-фраза в поле адреса узнаётся — двенадцать слов и двадцать четыре', () => {
+  assert.equal(looksLikeSeedPhrase(TEST_PHRASE), true);
+  assert.equal(looksLikeSeedPhrase(`${TEST_PHRASE} ${TEST_PHRASE}`), true);
+  assert.equal(looksLikeSeedPhrase(`  ${TEST_PHRASE}\n`), true);
+});
+
+test('сид-фраза узнаётся и в том виде, как её показывают кошельки: с номерами, через запятую', () => {
+  const words = TEST_PHRASE.split(' ');
+  assert.equal(looksLikeSeedPhrase(words.map((w, i) => `${i + 1}. ${w}`).join(' ')), true);
+  assert.equal(looksLikeSeedPhrase(words.map((w, i) => `${i + 1} ${w}`).join(' ')), true);
+  assert.equal(looksLikeSeedPhrase(words.map((w, i) => `${i + 1}.${w}`).join('\n')), true);
+  assert.equal(looksLikeSeedPhrase(words.join(', ')), true);
+});
+
+test('настоящие адреса за сид-фразу не принимаются', () => {
+  for (const addresses of Object.values(REAL)) {
+    for (const a of addresses) assert.equal(looksLikeSeedPhrase(a), false, a);
+  }
+  assert.equal(looksLikeSeedPhrase('abandon abandon abandon'), false); // слишком мало слов
+  assert.equal(looksLikeSeedPhrase(''), false);
 });

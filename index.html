@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Политика безопасности — то, что делает обещание «адрес никуда не уходит»
+  проверяемым одной строкой, а не на слово. Браузер сам запрещает странице:
+  connect-src 'none' — любые запросы из кода (fetch, XHR, WebSocket, beacon);
+  default-src 'none' — любые ресурсы, кроме явно разрешённых ниже;
+  script-src/style-src 'self' — скрипты и стили только из этого же репозитория;
+  form-action 'none' — отправку формы: даже если скрипт не загрузится,
+  адрес не уйдёт ни на сервер, ни в адресную строку.
+  img-src data: — только для пустой иконки ниже.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<!-- Пустая иконка: иначе браузер сам запрашивает /favicon.ico. -->
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="src/app.js"></script>
+<title></title>
+</head>
+<body>
+<main>
+  <h1 id="page-title"></h1>
+  <p id="privacy-note" class="privacy"></p>
+
+  <!--
+    У полей нет атрибута name, кроме переключателей (им он нужен, чтобы
+    работать группой): даже без CSP значение адреса не попало бы в URL.
+    autocomplete="off" — браузер не запоминает введённые адреса.
+  -->
+  <form id="form">
+    <label for="address" id="label-address"></label>
+    <input id="address" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+
+    <label for="network" id="label-network"></label>
+    <select id="network" required>
+      <option value=""></option>
+    </select>
+
+    <fieldset>
+      <legend id="label-recipient"></legend>
+      <p id="recipient-hint" class="hint"></p>
+      <div id="recipient-options" class="options"></div>
+    </fieldset>
+
+    <button type="submit" id="submit"></button>
+  </form>
+
+  <section id="answer" class="answer" tabindex="-1" aria-live="polite" hidden></section>
+</main>
+</body>
+</html>

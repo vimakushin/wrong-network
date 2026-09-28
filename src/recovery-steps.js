@@ -53,7 +53,7 @@ function nothingToFixSteps() {
 // что мы сначала зовём человека к постороннему разбираться, а тут же
 // говорим, что разбираться не в чем — два взаимоисключающих сигнала
 // подряд (нашёл editor).
-function hasFixMechanic(facts, specialCases) {
+export function hasFixMechanic(facts, specialCases) {
   return facts.addressFamily === 'evm' || specialCases.includes('btc-bch-legacy');
 }
 

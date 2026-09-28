@@ -1,0 +1,115 @@
+/* Одна колонка под телефон: человек читает это одной рукой, стоя над
+   своим кошельком. Шрифты только системные — внешний шрифт означал бы
+   запрос к чужому серверу. Поля не мельче 16px: иначе iOS увеличивает
+   страницу при нажатии на поле, и появляется горизонтальная прокрутка. */
+
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #5a5a5a;
+  --line: #c8c8c8;
+  --accent: #1f5fbf;
+  --warn-bg: #fff4e0;
+  --warn-line: #c77700;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --text: #ececec;
+    --muted: #a8a8a8;
+    --line: #4a4a4a;
+    --accent: #7fb0ff;
+    --warn-bg: #2e2412;
+    --warn-line: #e0a040;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow-wrap: anywhere; /* длинные адреса и ссылки не распирают страницу вбок */
+}
+
+main {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 { font-size: 1.4rem; line-height: 1.25; margin: 0 0 4px; }
+.privacy { color: var(--muted); margin: 0 0 20px; font-size: 0.95rem; }
+
+label, legend {
+  display: block;
+  font-weight: 600;
+  margin: 16px 0 6px;
+}
+
+input, select, button {
+  width: 100%;
+  min-height: 48px;
+  font: inherit;
+  font-size: 17px;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+#address { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 16px; }
+
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { padding: 0; }
+.hint { color: var(--muted); font-size: 0.95rem; margin: 0 0 8px; }
+
+.options label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 400;
+  min-height: 48px;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.options input { width: 22px; min-height: 0; height: 22px; margin: 0; flex: none; }
+
+button {
+  margin-top: 20px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+@media (prefers-color-scheme: dark) { button { color: #0b1a33; } }
+
+.answer { margin-top: 28px; padding-top: 4px; outline: none; }
+.answer h2 { font-size: 1.35rem; line-height: 1.25; margin: 0 0 8px; }
+.answer ol { padding-left: 1.4em; }
+.answer li { margin-bottom: 10px; }
+.note { border-left: 4px solid var(--line); padding-left: 12px; }
+.warning {
+  background: var(--warn-bg);
+  border-left: 4px solid var(--warn-line);
+  padding: 12px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Заглушка на месте текста, которого ещё нет (src/texts.js). Видна
+   нарочно: публиковать страницу с ней нельзя. */
+.missing {
+  display: block;
+  border: 2px dashed var(--warn-line);
+  padding: 8px;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
