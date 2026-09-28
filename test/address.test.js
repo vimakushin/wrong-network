@@ -108,20 +108,20 @@ test('evm: адрес в одном регистре принимается, н�
   assert.equal(r.status, 'no-checksum');
 });
 
-// TZ.md, раздел 3: префикс входит в контрольную сумму, чужой префикс не проходит.
+// Префикс входит в контрольную сумму, поэтому чужой префикс не проходит.
 test('cosmos: адрес Osmosis с префиксом cosmos не проходит', () => {
   const swapped = 'cosmos1' + 'osmo1clpqr4nrk4khgkxj78fcwwh6dl3uw4epasmvnj'.slice('osmo1'.length);
   assert.deepEqual(detectFamily(swapped), { family: 'cosmos', status: 'bad-checksum' });
 });
 
-// TZ.md, раздел 5: BEP-2 и BEP-20 путают по названию, форматы разные.
+// BEP-2 и BEP-20 путают по названию, хотя форматы разные.
 test('bnb1… — это BNB Beacon Chain, а не BNB Smart Chain', () => {
   assert.deepEqual(detectFamily(REAL.cosmos[3]).networks, ['BNB Beacon Chain (BEP-2)']);
   assert.ok(!detectFamily(REAL.cosmos[3]).networks.includes('BNB Smart Chain'));
   assert.ok(detectFamily(REAL.evm[2]).networks.includes('BNB Smart Chain'));
 });
 
-// TZ.md, раздел 5: устаревший формат Bitcoin Cash совпадает с Bitcoin.
+// Устаревший формат Bitcoin Cash совпадает с Bitcoin — на этом деньги и уходят не туда.
 test('bitcoin: у адресов 1… и 3… названа и Bitcoin Cash, у bc1… — нет', () => {
   assert.ok(detectFamily(REAL.bitcoin[0]).networks.some((n) => n.startsWith('Bitcoin Cash')));
   assert.ok(detectFamily(REAL.bitcoin[1]).networks.some((n) => n.startsWith('Bitcoin Cash')));

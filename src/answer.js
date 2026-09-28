@@ -23,10 +23,13 @@ function pick(table, tableName, key) {
   return { key: `${tableName}.${key}`, text: table[key] };
 }
 
+// Ключ текстов: исход плюс уточнение там, где один исход означает для
+// человека разные ситуации (см. комментарий к OUTCOME_TITLES в src/texts.js).
 function outcomeKey({ outcome, facts, specialCases }) {
   if ((outcome === 'B' || outcome === 'C') && !hasFixMechanic(facts, specialCases)) {
     return `${outcome}-nothing-to-fix`;
   }
+  if (outcome === 'unknown' && facts.addressStatus === 'bad-checksum') return 'unknown-typo';
   return outcome;
 }
 
@@ -44,10 +47,11 @@ export function buildAnswer(result) {
   }
   parts.push({ kind: 'warning', key: 'scam-warning', text: getScamWarning() });
 
-  const { steps, reason } = getSteps(result);
-  parts.push(steps
-    ? { kind: 'steps', key: 'recovery-steps', items: steps }
-    : { kind: 'reason', key: 'recovery-steps', text: reason });
+  // Если шагов нет, на странице ничего не добавляем: объяснение исхода
+  // выше уже говорит, почему делать нечего и что проверить, а причина
+  // «шагов нет» из getSteps повторила бы его другими словами.
+  const { steps } = getSteps(result);
+  if (steps) parts.push({ kind: 'steps', key: 'recovery-steps', items: steps });
   return parts;
 }
 

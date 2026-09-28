@@ -1,10 +1,10 @@
-// Тесты предупреждения о мошенниках (MVP.md, пункт 4). Запуск: npm test
+// Тесты предупреждения о мошенниках. Запуск: npm test
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { getScamWarning } from '../src/scam-warning.js';
 
-test('обязательные мысли из TZ.md, раздел 6, все на месте', () => {
+test('обязательные мысли все на месте: сид-фраза, приватный ключ, предоплата', () => {
   const text = getScamWarning();
   assert.ok(text.includes('сид-фраз'));
   assert.ok(text.includes('приватный ключ'));

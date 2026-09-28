@@ -1,7 +1,7 @@
 // Тесты сборки ответа и текстов интерфейса. Запуск: npm test
 //
 // Главное здесь — перебор: каждый адрес из набора с каждой сетью и каждым
-// типом получателя. Правило MVP.md, пункт 4, — предупреждение о мошенниках
+// типом получателя. Правило — предупреждение о мошенниках
 // в каждом ответе — проверяется на всех сочетаниях, а не на примерах.
 
 import { test } from 'node:test';
@@ -75,6 +75,23 @@ test('исход B там, где чинить нечего (TON), не полу
   const parts = buildAnswer(determineOutcome('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF', 'ton', 'own-wallet'));
   assert.equal(parts[0].key, 'OUTCOME_TITLES.B-nothing-to-fix');
   assert.notEqual(parts[0].text, T.OUTCOME_TITLES.B);
+});
+
+test('опечатка в узнанном адресе и нераспознанная строка получают разные ответы', () => {
+  const typo = buildAnswer(determineOutcome('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96044', 'ethereum', 'own-wallet'));
+  const garbage = buildAnswer(determineOutcome('не адрес', 'ethereum', 'own-wallet'));
+  assert.equal(typo[0].key, 'OUTCOME_TITLES.unknown-typo');
+  assert.equal(garbage[0].key, 'OUTCOME_TITLES.unknown');
+});
+
+test('где шагов нет, ответ заканчивается предупреждением, без повтора объяснения другими словами', () => {
+  for (const result of [
+    determineOutcome('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', 'tron', 'own-wallet'), // A
+    determineOutcome('EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF', 'ton', 'own-wallet'), // B, чинить нечего
+    determineOutcome('не адрес', 'ethereum', 'own-wallet'), // не знаем
+  ]) {
+    assert.equal(buildAnswer(result).at(-1).kind, 'warning', result.outcome);
+  }
 });
 
 test('признак «нет контрольной суммы» доходит до страницы отдельной пометкой', () => {
