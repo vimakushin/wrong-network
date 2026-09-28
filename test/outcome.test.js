@@ -15,9 +15,11 @@ const EVM_OTHER = '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
 const SOLANA = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 const BITCOIN_LEGACY = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
 const BITCOIN_SEGWIT = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4';
+// Остановленная BNB Beacon Chain — адрес не выдуманный, но сама сеть
+// уже не работает (TZ.md, исход F), поэтому это адрес, а не «живой» счёт.
 const BNB_BEACON = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';
 
-// --- Пять исходов из TZ.md, раздел 4 ---
+// --- Шесть исходов из TZ.md, раздел 4 ---
 
 test('исход A: сеть не принимает такой формат — пример из TZ.md (Tron на 0x…)', () => {
   const r = determineOutcome(EVM, 'tron', 'own-wallet');
@@ -54,6 +56,21 @@ test('исход E: признак «нет контрольной суммы» 
   const r = determineOutcome(c.address.toLowerCase(), c.network, 'own-wallet');
   assert.equal(r.outcome, 'E');
   assert.equal(r.hasNoChecksum, true);
+});
+
+test('исход F: BNB Beacon Chain остановлена — адрес bnb1… не зависит от выбранной сети отправки', () => {
+  const own = determineOutcome(BNB_BEACON, 'ethereum', 'own-wallet');
+  assert.equal(own.outcome, 'F');
+  // Сеть отправки указана заведомо не та (ethereum), а исход всё равно F —
+  // TZ.md прямо требует, чтобы это не зависело от выбора сети.
+  const sameViaOwnNetwork = determineOutcome(BNB_BEACON, 'bnb-beacon-chain', 'own-wallet');
+  assert.equal(sameViaOwnNetwork.outcome, 'F');
+});
+
+test('исход F: тип получателя сохраняется в фактах — от него зависит, кто может восстановить', () => {
+  const r = determineOutcome(BNB_BEACON, 'bnb-beacon-chain', 'other-wallet');
+  assert.equal(r.outcome, 'F');
+  assert.equal(r.facts.recipientType, 'other-wallet');
 });
 
 test('«не знаем»: сочетание не описано в TZ.md — формат вообще не опознан', () => {
@@ -93,13 +110,16 @@ test('Bitcoin/Bitcoin Cash: сегвит-адрес под пометку не �
   assert.ok(!r.specialCases.includes('btc-bch-legacy'));
 });
 
-test('BEP-2/BEP-20: адрес Beacon Chain (bnb1…) на сеть BNB Smart Chain', () => {
+test('BEP-2/BEP-20: адрес Beacon Chain (bnb1…) с сетью BNB Smart Chain — это исход F, не A', () => {
+  // Раньше это было отдельной пометкой при исходе A. После остановки
+  // BNB Beacon Chain (19 ноября 2024) для такого адреса всегда исход F,
+  // независимо от того, что выбрано сетью отправки — см. тест исхода F выше.
   const r = determineOutcome(BNB_BEACON, 'bnb-smart-chain', 'own-wallet');
-  assert.equal(r.outcome, 'A');
-  assert.ok(r.specialCases.includes('bep2-bep20'));
+  assert.equal(r.outcome, 'F');
+  assert.ok(!r.specialCases.includes('bep2-bep20'));
 });
 
-test('BEP-2/BEP-20: и наоборот — EVM-адрес на сеть BNB Beacon Chain', () => {
+test('BEP-2/BEP-20: EVM-адрес на сеть BNB Beacon Chain — исход A с пометкой, сеть жива только по названию', () => {
   const r = determineOutcome(EVM, 'bnb-beacon-chain', 'own-wallet');
   assert.equal(r.outcome, 'A');
   assert.ok(r.specialCases.includes('bep2-bep20'));

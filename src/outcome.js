@@ -61,13 +61,12 @@ function specialCasesFor(addr, networkId) {
     cases.push('btc-bch-legacy');
   }
 
-  // BEP-2 (bnb1…, семейство cosmos) и BEP-20 (0x…, семейство evm) — разные
-  // форматы одной и той же по названию сети. Совпадение семейств здесь
-  // невозможно в принципе, но путаница по названию — частая, поэтому даём
-  // отдельную пометку, а не общий «сеть не подходит».
-  if (networkId === 'bnb-smart-chain' && addr.family === 'cosmos' && addr.prefix === 'bnb') {
-    cases.push('bep2-bep20');
-  }
+  // BEP-2 (bnb1…) и BEP-20 (0x…) путают по названию. Направление «адрес
+  // bnb1…» сюда не входит: с 19 ноября 2024 сеть BNB Beacon Chain
+  // остановлена, для такого адреса всегда исход F — см. ниже, до
+  // вычисления обычного A/B/C/D. Здесь остаётся только обратное
+  // направление: адрес evm, а сеть отправки выбрана «BNB Beacon Chain»
+  // по ошибке в названии.
   if (networkId === 'bnb-beacon-chain' && addr.family === 'evm') {
     cases.push('bep2-bep20');
   }
@@ -99,7 +98,7 @@ function baseFacts(networkId, recipientType, addr) {
  * @param {string} address — строка адреса получателя, как её ввёл человек.
  * @param {string} networkId — id сети из src/networks.js.
  * @param {'own-wallet'|'other-wallet'|'exchange'} recipientType — TZ.md, раздел 2.
- * @returns {{outcome: 'A'|'B'|'C'|'D'|'E'|'unknown', hasNoChecksum: boolean, specialCases: string[], facts: object}}
+ * @returns {{outcome: 'A'|'B'|'C'|'D'|'E'|'F'|'unknown', hasNoChecksum: boolean, specialCases: string[], facts: object}}
  */
 export function determineOutcome(address, networkId, recipientType) {
   const network = NETWORKS[networkId];
@@ -134,6 +133,15 @@ export function determineOutcome(address, networkId, recipientType) {
   }
 
   const hasNoChecksum = addr.status === 'no-checksum';
+
+  // BNB Beacon Chain (bnb1…) остановлена 19 ноября 2024 года (TZ.md, раздел 5,
+  // и исход F в разделе 4). Какую бы сеть отправки человек ни указал, это не
+  // вопрос выбора сети: сети, которой принадлежит адрес, больше нет. Поэтому
+  // проверяем это раньше обычного сопоставления семейства и сети, а не как
+  // ещё один вариант исхода A/B/C/D.
+  if (addr.family === 'cosmos' && addr.prefix === 'bnb') {
+    return { outcome: 'F', hasNoChecksum, specialCases, facts };
+  }
 
   if (!familyMatches(addr, networkId, network)) {
     // TZ.md, исход A: сеть не приняла бы такой формат на вводе.
