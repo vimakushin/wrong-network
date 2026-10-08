@@ -30,20 +30,28 @@
     работать группой): даже без CSP значение адреса не попало бы в URL.
     autocomplete="off" — браузер не запоминает введённые адреса.
   -->
-  <form id="form">
+  <!--
+    novalidate и ни одного required: свою проверку браузер не включает, и
+    пустое поле не получает его красного выделения (цвета со смыслом, которого
+    мы не выбирали). О пустом поле говорит страница, см. src/app.js; скринридеру
+    «обязательное поле» вместо required говорит aria-required.
+  -->
+  <form id="form" novalidate>
     <label for="address" id="label-address"></label>
-    <input id="address" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <input id="address" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-required="true">
 
     <label for="network" id="label-network"></label>
-    <select id="network" required>
+    <select id="network" aria-required="true">
       <option value=""></option>
     </select>
 
-    <fieldset>
+    <fieldset role="radiogroup" aria-required="true" aria-labelledby="label-recipient">
       <legend id="label-recipient"></legend>
       <p id="recipient-hint" class="hint"></p>
       <div id="recipient-options" class="options"></div>
     </fieldset>
+
+    <p id="form-error" class="form-error" role="alert" hidden></p>
 
     <button type="submit" id="submit"></button>
   </form>

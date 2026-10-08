@@ -50,7 +50,6 @@ function setUpForm() {
     radio.type = 'radio';
     radio.name = 'recipient';
     radio.value = type;
-    radio.required = true;
     label.append(radio, T.RECIPIENT_OPTIONS[type]);
     options.append(label);
   }
@@ -77,7 +76,18 @@ function render(parts) {
   answer.focus({ preventScroll: true });
 }
 
+// Первое незаполненное поле по порядку на странице. Пробелы вместо адреса —
+// это пустое поле.
+function firstEmptyField() {
+  if ($('address').value.trim() === '') return 'address';
+  if ($('network').value === '') return 'network';
+  if (!form.querySelector('input[name="recipient"]:checked')) return 'recipient';
+  return null;
+}
+
 function hideAnswer() {
+  // Сообщение о пустом поле — такая же устаревшая пометка, как старый ответ.
+  $('form-error').hidden = true;
   $('answer').hidden = true;
   $('answer').replaceChildren();
 }
@@ -96,6 +106,7 @@ form.addEventListener('input', (event) => {
   // вставке и объясняем почему, не дожидаясь кнопки.
   if (event.target === address && looksLikeSeedPhrase(address.value)) {
     address.value = '';
+    hideAnswer();
     render(buildSeedPhraseAnswer());
     return;
   }
@@ -106,6 +117,15 @@ form.addEventListener('input', (event) => {
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
+  const empty = firstEmptyField();
+  hideAnswer();
+  if (empty) {
+    const error = fill($('form-error'), T.EMPTY_FIELD[empty], `EMPTY_FIELD.${empty}`);
+    error.hidden = false;
+    // Фокус на поле, о котором речь: у переключателей — на первый.
+    (empty === 'recipient' ? form.querySelector('input[name="recipient"]') : $(empty)).focus();
+    return;
+  }
   const recipient = form.querySelector('input[name="recipient"]:checked').value;
   render(buildAnswer(determineOutcome(address.value, $('network').value, recipient)));
 });
