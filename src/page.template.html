@@ -25,13 +25,13 @@
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 <script type="module" src="src/app.js"></script>
-<title>Не та сеть</title>
-<meta name="description" content="Не уверены, в ту ли сеть ушла криптовалюта? По адресу получателя, сети отправки и типу получателя объясним, что могло случиться и что можно сделать.">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
 </head>
 <body>
 <main>
-  <h1>Не та сеть</h1>
-  <p class="privacy">Адрес никуда не отправляется и не сохраняется.</p>
+  <h1>{{title}}</h1>
+  <p class="privacy">{{privacy}}</p>
 
   <!--
     У полей нет атрибута name, кроме переключателей (им он нужен, чтобы
@@ -45,43 +45,26 @@
     «обязательное поле» вместо required говорит aria-required.
   -->
   <form id="form" novalidate>
-    <label for="address">Адрес получателя</label>
+    <label for="address">{{labelAddress}}</label>
     <input id="address" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-required="true">
 
-    <label for="network">Сеть отправки</label>
+    <label for="network">{{labelNetwork}}</label>
     <select id="network" aria-required="true">
       <option value=""></option>
-      <option value="ethereum">Ethereum</option>
-      <option value="bnb-smart-chain">BNB Smart Chain (BEP-20)</option>
-      <option value="polygon">Polygon</option>
-      <option value="arbitrum">Arbitrum</option>
-      <option value="optimism">Optimism</option>
-      <option value="base">Base</option>
-      <option value="avalanche-c-chain">Avalanche C-Chain</option>
-      <option value="tron">Tron</option>
-      <option value="solana">Solana</option>
-      <option value="ton">TON</option>
-      <option value="bitcoin">Bitcoin</option>
-      <option value="bitcoin-cash">Bitcoin Cash</option>
-      <option value="cosmos-hub">Cosmos Hub</option>
-      <option value="osmosis">Osmosis</option>
-      <option value="bnb-beacon-chain">BNB Beacon Chain (BEP-2)</option>
-      <option value="avalanche-x-chain">Avalanche X-Chain</option>
+{{networkOptions}}
     </select>
 
     <fieldset role="radiogroup" aria-required="true" aria-labelledby="label-recipient">
-      <legend id="label-recipient">Тип получателя</legend>
-      <p class="hint">Если вы получали этот адрес в приложении кошелька, где у вас записана сид-фраза (обычно двенадцать слов, иногда двадцать четыре), — это ваш кошелёк; если копировали из раздела пополнения на бирже — это биржа.</p>
+      <legend id="label-recipient">{{labelRecipient}}</legend>
+      <p class="hint">{{hint}}</p>
       <div class="options">
-        <label><input type="radio" name="recipient" value="own-wallet">мой собственный кошелёк</label>
-        <label><input type="radio" name="recipient" value="other-wallet">чужой кошелёк</label>
-        <label><input type="radio" name="recipient" value="exchange">адрес пополнения на бирже</label>
+{{recipientOptions}}
       </div>
     </fieldset>
 
     <p id="form-error" class="form-error" role="alert" hidden></p>
 
-    <button type="submit">Проверить</button>
+    <button type="submit">{{submit}}</button>
   </form>
 
   <section id="answer" class="answer" tabindex="-1" aria-live="polite" hidden></section>

@@ -1,13 +1,13 @@
-// Страница: заполняет форму текстами из src/texts.js, по кнопке считает
-// исход и рисует ответ. Вся логика — в других файлах, здесь только
-// связь с разметкой index.html.
+// Страница: по кнопке считает исход и рисует ответ. Вся логика — в других
+// файлах, здесь только связь с разметкой index.html. Сама форма (подписи,
+// список сетей, варианты получателя) уже в index.html: его собирает
+// scripts/build-page.js, чтобы текст был виден и без скриптов.
 //
 // Ни одного обращения в сеть: только чтение полей и изменение страницы.
 // Адрес нигде не сохраняется — ни в хранилище браузера, ни в адресной
 // строке, ни в истории.
 
-import { determineOutcome, RECIPIENT_TYPES } from './outcome.js';
-import { NETWORKS } from './networks.js';
+import { determineOutcome } from './outcome.js';
 import { looksLikeSeedPhrase } from './address.js';
 import { buildAnswer, buildSeedPhraseAnswer } from './answer.js';
 import * as T from './texts.js';
@@ -26,33 +26,6 @@ function fill(el, text, key) {
     el.textContent = text;
   }
   return el;
-}
-
-function setUpForm() {
-  if (T.PAGE_TITLE !== null) document.title = T.PAGE_TITLE;
-  fill($('page-title'), T.PAGE_TITLE, 'PAGE_TITLE');
-  fill($('privacy-note'), T.PRIVACY_NOTE, 'PRIVACY_NOTE');
-  fill($('label-address'), T.LABELS.address, 'LABELS.address');
-  fill($('label-network'), T.LABELS.network, 'LABELS.network');
-  fill($('label-recipient'), T.LABELS.recipient, 'LABELS.recipient');
-  fill($('recipient-hint'), T.RECIPIENT_HINT, 'RECIPIENT_HINT');
-  fill($('submit'), T.SUBMIT, 'SUBMIT');
-
-  const select = $('network');
-  for (const id of Object.keys(NETWORKS)) {
-    select.append(new Option(T.NETWORK_NAMES[id], id));
-  }
-
-  const options = $('recipient-options');
-  for (const type of RECIPIENT_TYPES) {
-    const label = document.createElement('label');
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'recipient';
-    radio.value = type;
-    label.append(radio, T.RECIPIENT_OPTIONS[type]);
-    options.append(label);
-  }
 }
 
 function render(parts) {
@@ -91,8 +64,6 @@ function hideAnswer() {
   $('answer').hidden = true;
   $('answer').replaceChildren();
 }
-
-setUpForm();
 
 const form = $('form');
 const address = $('address');
