@@ -26,7 +26,7 @@ function pick(table, tableName, key) {
 // Ключ текстов: исход плюс уточнение там, где один исход означает для
 // человека разные ситуации (см. комментарий к OUTCOME_TITLES в src/texts.js).
 function outcomeKey({ outcome, facts, specialCases }) {
-  if ((outcome === 'B' || outcome === 'C') && !hasFixMechanic(facts, specialCases)) {
+  if ((outcome === 'B' || outcome === 'C' || outcome === 'D') && !hasFixMechanic(facts, specialCases)) {
     return `${outcome}-nothing-to-fix`;
   }
   if (outcome === 'unknown' && facts.addressStatus === 'bad-checksum') return 'unknown-typo';

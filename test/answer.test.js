@@ -114,3 +114,34 @@ test('названия есть у каждой сети из src/networks.js и
   assert.deepEqual(Object.keys(T.NETWORK_NAMES).sort(), Object.keys(NETWORKS).sort());
   assert.deepEqual(Object.keys(T.RECIPIENT_OPTIONS).sort(), [...RECIPIENT_TYPES].sort());
 });
+
+test('биржа: если адрес и сеть подходят друг другу и чинить нечего, исход D не выдаётся — ответ как для своего кошелька', () => {
+  // Была ошибка: Bitcoin (bc1…) + сеть Bitcoin + биржа давали «Зависит от
+  // биржи», хотя ошибки нет. То же для Solana, TON, Cosmos. Tron тут нет:
+  // единственный настоящий адрес Tron в тестах — контракт USDT, он даёт E.
+  const cases = [
+    ['bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', 'bitcoin'],
+    ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'solana'],
+    ['EQDKbjIcfM6ezt8KjKJJLshZJJSqX7XOA4ff-W72r5gqPrHF', 'ton'],
+    ['cosmos1fl48vsnmsdzcv85q5d2q4z5ajdha8yu34mf0eh', 'cosmos-hub'],
+  ];
+  for (const [address, networkId] of cases) {
+    const own = buildAnswer(determineOutcome(address, networkId, 'own-wallet'));
+    const exchange = buildAnswer(determineOutcome(address, networkId, 'exchange'));
+    assert.equal(exchange[0].text, 'Ошибки в сети нет', networkId);
+    assert.equal(exchange[0].text, own[0].text, networkId);
+    assert.equal(exchange[1].text, own[1].text, networkId);
+    assert.ok(!exchange.some((p) => p.kind === 'steps'), networkId);
+  }
+});
+
+test('биржа: EVM и устаревший Bitcoin/Bitcoin Cash по-прежнему дают «Зависит от биржи» с шагами', () => {
+  for (const [address, networkId] of [
+    ['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', 'polygon'],
+    ['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 'bitcoin'],
+  ]) {
+    const parts = buildAnswer(determineOutcome(address, networkId, 'exchange'));
+    assert.equal(parts[0].text, 'Зависит от биржи', networkId);
+    assert.ok(parts.some((p) => p.kind === 'steps'), networkId);
+  }
+});
