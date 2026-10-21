@@ -4,7 +4,7 @@
   "scripts": {
     "test": "node --test"
   },
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "private": true
 }
